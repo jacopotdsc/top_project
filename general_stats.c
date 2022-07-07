@@ -22,24 +22,41 @@ void read_stats_cpu(float* param){
 // https://rosettacode.org/wiki/Linux_CPU_utilization
 float general_cpu_usage(){
 	
-	float old_param[4];
-	read_stats_cpu(old_param);
+	float param[10];
+	read_stats_cpu(param);
 	
 	/* sleep(1);	// gli permetto di aggiornarsi
 	
 	long double new_param[4];
 	read_stats(new_param); */
 	
-	//float hertz = sysconf(_SC_CLK_TCK); // frequenza della CPU
+	float user_time		= param[0]; 
+	float nice_time		= param[1]; 
+	float system_time	= param[2]; 
+	float idle_time		= param[3]; 
+	float iowait_time 	= param[4];
+	float irq_time	 	= param[5];
+	float softirq_time 	= param[6];
+	float steal_time 	= param[7];
+	float guest_time 	= param[8];
+	float guest_nice_time 	= param[9];
 	
-	// per calcolare l'utilizzo totale,
-	// normalizzo la differenza tra i due sample
 	
-	float total_time 	= old_param[0] + old_param[1] + old_param[2] + old_param[3];
-	float idle_time 	= old_param[3] / total_time;
-	float cpu_usage 	= 100* ( 1 - idle_time );
+	printf("ut: %.2f, nt: %.2f, st: %.2f, id: %.2f\n", user_time, nice_time, system_time, idle_time);
 	
-	return cpu_usage;
+	float hertz = sysconf(_SC_CLK_TCK); // frequenza della CPU
+	
+	
+	float total_time = 0;
+	
+	for( int i=0; i < sizeof(*param); i++) total_time += param[i];
+	
+	//float total_time = user_time + nice_time + system_time + idle_time;
+	//float idle_time_percentage	= idle_time / total_time;
+	//float cpu_usage_percentage = 100*( ( 1 - idle_time ) / hertz );
+	float cpu_usage_percentage = ( ( total_time - idle_time ) / hertz ) / total_time;
+	
+	return 100*cpu_usage_percentage;
 }
 
 
@@ -51,7 +68,7 @@ void read_stats_memory(float* param){
 	
 	
 	// total memory, free, avaible, buffers, chached
-	for( int i=0; i < 5; i++) fscanf(my_file,"%*s %f %*s", &param[i] );
+	for( int i=0; i < sizeof(*param); i++) fscanf(my_file,"%*s %f %*s", &param[i] );
 
 	close( (int) my_file);
 }
@@ -69,11 +86,11 @@ float general_memory_usage(){
 	float buffer_memory = param[3];
 	float cached_memory = param[4];
 	
-	//printf("tf: %f.2, fm: %f.2, bm: %f.2, cm: %f.2\n", total_memory, free_memory, buffer_memory, cached_memory);
+	//printf("tf: %.2f, fm: %.2f, bm: %.2f, cm: %.2f\n", total_memory, free_memory, buffer_memory, cached_memory);
 	
 	float total_memory_usage = total_memory - ( free_memory + buffer_memory + cached_memory );
 	
-	float total_memory_usage_percentuage = 100*(total_memory_usage / total_memory);
+	float total_memory_usage_percentage = 100*(total_memory_usage / total_memory);
 	
-	return total_memory_usage_percentuage;
+	return total_memory_usage_percentage;
 }

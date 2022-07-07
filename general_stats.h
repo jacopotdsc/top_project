@@ -5,5 +5,5 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-float general_cpu_usage();
-float general_memory_usage();
+float general_cpu_usage();		// calcola la % totale di utilizzo della CPU
+float general_memory_usage();	// calcola la % totale di utilizzo della memoria

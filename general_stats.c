@@ -11,7 +11,7 @@ void read_stats_cpu(float* param){
 	// controlla se è stato aperto correttamente, in caso stampa il msg di errore e termina
 	handle_error(my_file, "general_stats.c -> general_cpu_usage: file not opened");	
 			
-	fscanf(my_file,"%*s %f %f %f %f", &param[0], &param[1], &param[2], &param[3] );
+	fscanf(my_file,"%*s %f %f %f %f %f %f %f %f %f %f", &param[0], &param[1], &param[2], &param[3], &param[4], &param[5], &param[6], &param[7], &param[8], &param[9] );
 	
 	//printf("%f %f %f %f\n",param[0], param[1], param[2], param[3]);
 	
@@ -42,22 +42,30 @@ float general_cpu_usage(){
 	float guest_nice_time 	= param[9];
 	
 	
-	printf("ut: %.2f, nt: %.2f, st: %.2f, id: %.2f\n", user_time, nice_time, system_time, idle_time);
+	//printf("ut: %.2f, nt: %.2f, st: %.2f, id: %.2f\n", user_time, nice_time, system_time, idle_time);
 	
 	float hertz = sysconf(_SC_CLK_TCK); // frequenza della CPU
 	
 	
 	float total_time = 0;
 	
-	for( int i=0; i < sizeof(*param); i++) total_time += param[i];
+	//printf("dim: %d\n", sizeof(param)/sizeof(float));
+	for( int i=0; i < sizeof(param)/sizeof(float); i++){ 
+		total_time += param[i]; 
+		//printf("param[%d]: %f, \n",i, param[i]);
+	}
 	
 	//float total_time = user_time + nice_time + system_time + idle_time;
-	//float idle_time_percentage	= idle_time / total_time;
-	//float cpu_usage_percentage = 100*( ( 1 - idle_time ) / hertz );
-	float cpu_usage_percentage = ( ( total_time - idle_time ) / hertz ) / total_time;
 	
-	return 100*cpu_usage_percentage;
+	float idle_time_percentage	= idle_time / total_time;
+	float cpu_usage_percentage = 100*( ( 1.0 - idle_time_percentage ) );
+	//float cpu_usage_percentage = ( ( total_time - idle_time ) ) / total_time;
+	
+	//printf("total time: %f, idle_time: %f, cpu_usage: %f, sum: %f \n \n", total_time, idle_time_percentage, cpu_usage_percentage, (1-idle_time_percentage));
+	
+	return cpu_usage_percentage;
 }
+
 
 
 void read_stats_memory(float* param){
@@ -68,7 +76,8 @@ void read_stats_memory(float* param){
 	
 	
 	// total memory, free, avaible, buffers, chached
-	for( int i=0; i < sizeof(*param); i++) fscanf(my_file,"%*s %f %*s", &param[i] );
+	//printf("size *param: %d, size param: %d, float: %d\n", sizeof(*param), sizeof(param), sizeof(float));
+	for( int i=0; i < sizeof(param) / sizeof(float); i++) fscanf(my_file,"%*s %f %*s", &param[i] );
 
 	close( (int) my_file);
 }

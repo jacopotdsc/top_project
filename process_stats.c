@@ -2,13 +2,12 @@
 
 void read_file_stat(const char* path, float* param){	// legge il file /proc/[pid]/stat
 	
-	//printf("size *aux: %d, size aux: %d, float: %d\n", sizeof(*aux), sizeof(aux), sizeof(float));
-	
+	printf("rfs, path: %s\n", path);
 	FILE* my_file = fopen(path, "r"); 	//apro il file in lettura
-	//printf("path: %s\n", path);
+	printf("path: %s\n", path);
 	
 	// controlla se è stato aperto correttamente, in caso stampa il msg di errore e termina
-	handle_error(my_file, "process_stats.c -> read_stats_process: file not opened");	
+	handle_error(my_file, "process_stats.c -> read_stats_process: file path not opened");	
 	
 	char* line;
 	size_t linesize = 0;
@@ -35,7 +34,7 @@ void read_file_stat(const char* path, float* param){	// legge il file /proc/[pid
 	
 	FILE* my_file2 = fopen("/proc/uptime", "r"); 	
 	
-	handle_error(my_file2, "general_stats.c -> general_cpu_usage: file not opened");	
+	handle_error(my_file2, "general_stats.c -> read_stats_process: file uptime not opened");	
 	
 	char aux;
 	fscanf(my_file2, "%f %f", &param[5], &aux);	// aux[1] serve per scaricare da qualche parte la scanf
@@ -47,7 +46,7 @@ void read_file_stat(const char* path, float* param){	// legge il file /proc/[pid
 	
 }
 
-float calculate_cpu_usage(const char* path){
+float calculate_cpu_usage(const char* path){	// calcola l'utilizzo della cpu
 	
 	//printf("path: %s\n", path);
 	float param[6];
@@ -68,15 +67,19 @@ float calculate_cpu_usage(const char* path){
 	//printf("hertz: %f\n", hertz);
 	
 	float total_time = utime + stime + cutime + cstime;	// tempo speso dal processo
-	float seconds = uptime - (starttime / hertz);	// tempo totale trascorso
-	float cpu_usage = ((total_time / hertz) / seconds);	// % di uso della cpu
+	float seconds 	 = uptime - (starttime / hertz);	// tempo totale trascorso
+	float cpu_usage  = ((total_time / hertz) / seconds);	// % di uso della cpu
 	
-	return 100*cpu_usage;
+	float cpu_usage_percentage = 100*cpu_usage;
+	
+	printf("--ret: %f--\n", cpu_usage_percentage);
+	
+	return cpu_usage_percentage;
 
 }
 
 // https://stackoverflow.com/questions/16726779/how-do-i-get-the-total-cpu-usage-of-an-application-from-proc-pid-stat
-float process_cpu_usage(const char* path){
+float process_cpu_usage(const char* path){ // wrapper per sopra
 	return calculate_cpu_usage(path);
 }
 
@@ -86,22 +89,22 @@ void read_file_status(const char* path, float* param){	// legge il file /proc/[p
 	FILE* my_file = fopen(path, "r"); 	//apro il file in lettura
 	
 	// controlla se è stato aperto correttamente, in caso stampa il msg di errore e termina
-	handle_error(my_file, "process_stats.c -> read_stats_process: file not opened");	
+	handle_error(my_file, "process_stats.c -> read_file_status: file not opened");	
 	
 	char* line;
 	size_t linesize = 0;
 	int i = 0;
 	while( getline(&line, &linesize, my_file) != -1 ){
 		
-		char* token = strtok(line, " ");
-    
+		//printf("\nline: %s", line);
+		char* token = strtok(line, "\t");
+		//printf("token: %s\n", token);
+		
 		if( TOKEN_MASK ){
-			printf(" entrato: ");
 			param[i] = atoi( strtok(NULL, " ") );
-			printf("token: %s, param[%d]: %f\n", token, index, param[index]);
+			//printf("token: %s, param[%d]: %f\n", token, i, param[i]);
 			i++;
 		}
-
 	}
 	
     close( (int) my_file);
@@ -111,27 +114,58 @@ void read_file_status(const char* path, float* param){	// legge il file /proc/[p
 	handle_error(my_file2, "process_stat.c -> read_file_status: file not opened");	
 	
 	char aux;
-	fscanf(my_file2, "%f %f", &param[3], &aux);	// aux[1] serve per scaricare da qualche parte la scanf
+	fscanf(my_file2, "%*s %f", &param[3]);	// aux[1] serve per scaricare da qualche parte la scanf
 	
 	close( (int) my_file2);
 	
-	//printf("%f %f %f %f %f %f\n",param[0], param[1], param[2], param[3], param[4], param[5]);
+	//printf("%f %f %f %f \n",param[0], param[1], param[2], param[3]);
 	//sleep(3);
 	
 }
 
-float process_memory_usage(const char* path){
+float process_memory_usage(const char* path){	// calcola l'uso della memoria
 	float param[4];
-	read_file_stat(path, param);
+	read_file_status(path, param);
 	
 	float RssAnon 	= param[0];
 	float RssFile 	= param[1];
 	float RssShmem 	= param[2];
 	float tot_mem 	= param[3];
 	
-	printf("ra: %f, rf: %f, rs: %f, tm: %f\n", RssAnon, RssFile, RssShmem, tot_mem);
+	//printf("ra: %f, rf: %f, rs: %f, tm: %f\n", RssAnon, RssFile, RssShmem, tot_mem);
 	
 	float memory_usage = ( RssAnon + RssFile + RssShmem ) / tot_mem;
 	
 	return 100 * memory_usage;
 }
+
+int process_id(char* path){	// mi restituisce id del processo
+	
+	char buff[80];
+	strcpy(buff,path);
+	
+	char* token = strtok(buff,"/");
+	token = strtok(NULL,"/");
+	
+	return atoi(token);
+	
+}
+
+char* process_state(char* path){	// mi restituisce lo stato del processo
+	FILE* my_file = fopen(path, "r"); 	//apro il file in lettura
+	
+	// controlla se è stato aperto correttamente, in caso stampa il msg di errore e termina
+	handle_error(my_file, "process_stats.c -> read_file_status: file not opened");	
+	
+	char* line;
+	size_t linesize = 0;
+	int i = 0;
+	while( getline(&line, &linesize, my_file) != -1 ){
+
+		char* token = strtok(line, "\t");
+		
+		if( strcmp(token, &"State:") == 0 )
+			return strtok(NULL, " ");
+	}
+}
+

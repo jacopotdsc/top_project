@@ -9,7 +9,7 @@ void read_stats_cpu(float* param){
 	FILE* my_file = fopen("/proc/stat", "r"); 	//apro il file in lettura
 	
 	// controlla se è stato aperto correttamente, in caso stampa il msg di errore e termina
-	handle_error(my_file, "general_stats.c -> general_cpu_usage: file not opened");	
+	handle_error(my_file, "general_stats.c -> read_stats_cpu: file not opened");	
 			
 	fscanf(my_file,"%*s %f %f %f %f %f %f %f %f %f %f", &param[0], &param[1], &param[2], &param[3], &param[4], &param[5], &param[6], &param[7], &param[8], &param[9] );
 	
@@ -72,7 +72,7 @@ void read_stats_memory(float* param){
 	FILE* my_file = fopen("/proc/meminfo", "r"); 	//apro il file in lettura
 	
 	// controlla se è stato aperto correttamente, in caso stampa il msg di errore e termina
-	handle_error(my_file, "general_stats.c -> general_cpu_usage: file not opened");	
+	handle_error(my_file, "general_stats.c -> read_stats_memory: file not opened");	
 	
 	
 	// total memory, free, avaible, buffers, chached

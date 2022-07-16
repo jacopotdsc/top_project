@@ -4,10 +4,10 @@ void read_file_stat(const char* path, float* param){	// legge il file /proc/[pid
 	
 	printf("rfs, path: %s\n", path);
 	FILE* my_file = fopen(path, "r"); 	//apro il file in lettura
-	printf("path: %s\n", path);
+	//printf("path: %s\n", path);
 	
 	// controlla se è stato aperto correttamente, in caso stampa il msg di errore e termina
-	handle_error(my_file, "process_stats.c -> read_stats_process: file path not opened");	
+	handle_error(my_file, "process_stats.c -> read_file_stat, f1: file path not opened");	
 	
 	char* line;
 	size_t linesize = 0;
@@ -34,7 +34,7 @@ void read_file_stat(const char* path, float* param){	// legge il file /proc/[pid
 	
 	FILE* my_file2 = fopen("/proc/uptime", "r"); 	
 	
-	handle_error(my_file2, "general_stats.c -> read_stats_process: file uptime not opened");	
+	handle_error(my_file2, "general_stats.c -> read_file_stat, f2: file uptime not opened");	
 	
 	char aux;
 	fscanf(my_file2, "%f %f", &param[5], &aux);	// aux[1] serve per scaricare da qualche parte la scanf
@@ -72,7 +72,7 @@ float calculate_cpu_usage(const char* path){	// calcola l'utilizzo della cpu
 	
 	float cpu_usage_percentage = 100*cpu_usage;
 	
-	printf("--ret: %f--\n", cpu_usage_percentage);
+	//printf("--ret: %f--\n", cpu_usage_percentage);
 	
 	return cpu_usage_percentage;
 
@@ -89,7 +89,7 @@ void read_file_status(const char* path, float* param){	// legge il file /proc/[p
 	FILE* my_file = fopen(path, "r"); 	//apro il file in lettura
 	
 	// controlla se è stato aperto correttamente, in caso stampa il msg di errore e termina
-	handle_error(my_file, "process_stats.c -> read_file_status: file not opened");	
+	handle_error(my_file, "process_stats.c -> read_file_status, f1: file not opened");	
 	
 	char* line;
 	size_t linesize = 0;
@@ -107,16 +107,19 @@ void read_file_status(const char* path, float* param){	// legge il file /proc/[p
 		}
 	}
 	
-    close( (int) my_file);
+	int ret = fclose( my_file);
+    if( ret == EOF ) printf( "non fatto\n");
+
 	
 	FILE* my_file2 = fopen("/proc/meminfo", "r"); 	
 	
-	handle_error(my_file2, "process_stat.c -> read_file_status: file not opened");	
+	handle_error(my_file2, "process_stat.c -> read_file_status, f2: file not opened");	
 	
 	char aux;
 	fscanf(my_file2, "%*s %f", &param[3]);	// aux[1] serve per scaricare da qualche parte la scanf
 	
-	close( (int) my_file2);
+	ret = fclose( my_file);
+    if( ret == EOF ) printf( "non fatto\n");
 	
 	//printf("%f %f %f %f \n",param[0], param[1], param[2], param[3]);
 	//sleep(3);
@@ -155,7 +158,7 @@ char* process_state(char* path){	// mi restituisce lo stato del processo
 	FILE* my_file = fopen(path, "r"); 	//apro il file in lettura
 	
 	// controlla se è stato aperto correttamente, in caso stampa il msg di errore e termina
-	handle_error(my_file, "process_stats.c -> read_file_status: file not opened");	
+	handle_error(my_file, "process_stats.c -> process_state: file not opened");	
 	
 	char* line;
 	size_t linesize = 0;
@@ -167,5 +170,7 @@ char* process_state(char* path){	// mi restituisce lo stato del processo
 		if( strcmp(token, &"State:") == 0 )
 			return strtok(NULL, " ");
 	}
+	
+	close( (int) my_file);
 }
 

@@ -55,31 +55,44 @@ char* get_process(){
 			
 		printf("dir: %s\n", name);
 		
-		char* path = create_path_pid(name);
-		printf("path: %s \n", path);
+		char string_proc[10] = "/proc/";
+		char* path = strcat(string_proc, name);
+		printf("0 -> path: %s \n", path);
 		
 		
 		// da questo punto, mi creo la stringa finale che contiene tutte le statistiche del processo
 		
-		char* path_stat = strcat(path, "/stat");
-		printf("path_stat: %s\n", path_stat);
+		char* path1 = (char*)malloc(sizeof(char)*20);
+		char* path2 = (char*)malloc(sizeof(char)*20);
 		
-		p_cpu_usage = process_cpu_usage(path_stat);
+		char file1[6] = "/stat";
+		char file2[8] = "/status";
+
+		strcpy(path1, path);
+		strcpy(path2, path);
 		
-		char* path_status = strcat(path, "us");
-		printf("path_status: %s\n", path_status);
+		printf("path1: %s \n", path1);
+		printf("path2: %s \n", path2);
+
+		char* path_stat   = strcat(path1, file1);
+		printf("1.2-> path_stat: %s \n", path_stat);
+		char* path_status = strcat(path2, file2);
+		printf("2.2 -> path_status: %s \n", path_status);
 		
+
+		p_cpu_usage = process_cpu_usage(path_stat);	
 		p_mem_usage = process_memory_usage(path_status);
 		p_id = process_id(path_status);
 		p_state = process_state(path_status);
 		
 		printf("cpu: %f, mem: %f, id: %d, state: %s\n", p_cpu_usage, p_mem_usage, p_id, p_state);
 		
-		sleep(1);
-		
+		//sleep(1);
 	}
 	
-	sleep(1);
+	free( my_struct);
+	closedir( my_dir );
+	
 	printf("----finito----\n");
 	return "bene";
 }

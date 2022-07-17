@@ -1,0 +1,65 @@
+/proc/[pid]/smpas: mostra il consumo della memoria
+
+/proc/[pid]/stat: informazioni riguardo il processo, punti cruciale
+	
+	14) utime %lu: 	tempo che il processo è stato schedulato
+		   	schedulato in usermode 
+			( misurato  in clock ticks e diviso
+			per sysconf( _SC_CLK_TCK) )
+	
+	15) stime %lu:	tempo nel kernel mode, calcoalto come prima
+	
+	16) cutime %ld:	tempo speso per l'attesa di un figlio che
+			aspetta di essere scehdulato in user mode
+
+	17) cstime %ld:	tempo speso per l'attesa di un figlio che
+			aspetta di essere scehdulato in kernel mode
+
+	23) vsize %ld: 	dimensione della memoria virtuale
+
+	39) processor:	numero della cpu su cui è stato eseguito
+			l'utlima volta
+
+/proc/[pid]/statm:  informa riguardo l'uso della memoria
+
+/proc/[pid]/status: altre info sul processo, vedine alcune
+		    come quelle sulla memoria virtuale
+
+
+----------------------
+
+organizzazione file
+
+	- my_main.c:	prepara tutto e mette in esecuzione il processo -> fork per il plotter
+	
+	- general_stats.h:	scrivo le dichiarazioni delle statistiche dl plottare e variabili:
+							- total CPU usage
+							- total memory usage
+					
+	- general_stats.c:	scrivo le funzioni
+	
+	- process_stats.h:	scrivo dichiarazioni funzione che devo plottare per ogni processo
+							- CPU usage
+							- memory usage
+							- pid
+							- user
+							- stato processo
+							
+	- process_stats.c: 	implementazione
+	
+	- main_process.h: 	dichiarazioni funzioni utilizzate dal process top
+		
+							define / macro dei segnali
+							signal:
+								- kill
+								- resume
+								- terminate
+								- suspend
+	
+	- main_process.c: 	implementazioni funzioni
+	
+	- plotter_process.h:	plotta le info
+	
+	- plotter_process.c:	implemetazione
+	
+

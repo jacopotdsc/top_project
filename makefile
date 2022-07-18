@@ -12,6 +12,16 @@ $(EXEC): $(OBJECTS)
 %.o: %.c 
 	$(CC) -c $(CFILES) -w
 	
+
+#process_stats.o: process_stats.c
+#	$(CC) -c process_stats.c -w
+	
+#general_stat.o: general_stat.c
+#	$(CC) -c general_stat.c -w
+	
+#plotter_process.o: plotter_process.c
+#	$(CC) -c plotter_process.c -w	
+
 # per compilare con warning
 w:
 	$(CC) -c $(CFILES) 

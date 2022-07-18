@@ -15,7 +15,7 @@ void read_stats_cpu(float* param){
 	
 	//printf("%f %f %f %f\n",param[0], param[1], param[2], param[3]);
 	
-	close( (int) my_file);
+	handle_error_fclose( fclose( my_file), "read_stats_cpu, error closing");
 }
 
 
@@ -24,11 +24,6 @@ float general_cpu_usage(){
 	
 	float param[10];
 	read_stats_cpu(param);
-	
-	/* sleep(1);	// gli permetto di aggiornarsi
-	
-	long double new_param[4];
-	read_stats(new_param); */
 	
 	float user_time		= param[0]; 
 	float nice_time		= param[1]; 
@@ -49,10 +44,8 @@ float general_cpu_usage(){
 	
 	float total_time = 0;
 	
-	//printf("dim: %d\n", sizeof(param)/sizeof(float));
 	for( int i=0; i < sizeof(param)/sizeof(float); i++){ 
 		total_time += param[i]; 
-		//printf("param[%d]: %f, \n",i, param[i]);
 	}
 	
 	//float total_time = user_time + nice_time + system_time + idle_time;
@@ -71,7 +64,6 @@ float general_cpu_usage(){
 void read_stats_memory(float* param){
 	FILE* my_file = fopen("/proc/meminfo", "r"); 	//apro il file in lettura
 	
-	// controlla se è stato aperto correttamente, in caso stampa il msg di errore e termina
 	handle_error(my_file, "general_stats.c -> read_stats_memory: file not opened");	
 	
 	
@@ -79,7 +71,7 @@ void read_stats_memory(float* param){
 	//printf("size *param: %d, size param: %d, float: %d\n", sizeof(*param), sizeof(param), sizeof(float));
 	for( int i=0; i < sizeof(param) / sizeof(float); i++) fscanf(my_file,"%*s %f %*s", &param[i] );
 
-	close( (int) my_file);
+	handle_error_fclose( fclose( my_file), "read_stats_memory, error closing");
 }
 
 // https://sites.google.com/a/thetnaing.com/therunningone/how-to-calculate-systems-memory-utilization

@@ -114,7 +114,7 @@ void read_file_status(const char* path, float* param){	// legge il file /proc/[p
 	char aux;
 	fscanf(my_file2, "%*s %f", &param[3]);	// aux[1] serve per scaricare da qualche parte la scanf
 	
-	handle_error_fclose( fclose( my_file), "read_file_status f2, error closing");
+	handle_error_fclose( fclose( my_file2), "read_file_status f2, error closing");
 	
 	//printf("%f %f %f %f \n",param[0], param[1], param[2], param[3]);
 	//sleep(3);

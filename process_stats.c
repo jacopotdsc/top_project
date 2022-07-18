@@ -166,9 +166,30 @@ float process_memory_usage(const char* path){	// calcola l'uso della memoria
 	//+printf("p[0]: %f, p[1]: %f, p[3]: %f, p[5]: %f\n", param[0], param[1], param[3], param[5]);
 	
 	
+	// calcolo la ram totale
+	
+	FILE* my_file3 = fopen("/proc/meminfo","r");
+	handle_error(my_file3, "process_stats.c -> process_memory_usage, f3: file not opened");
+	
+	float tot_mem;
+	
+	char* line;
+	size_t linesize = 0;
+	int i = 0;
+	while( getline(&line, &linesize, my_file3) != -1 ){
+		char* token = strtok(line, " ");
+		//printf("token: %s\n",token);
+		if( strcmp(token, &"MemTotal:") == 0 )
+			tot_mem = atoi( strtok(NULL, " ") );
+	}
+	
+	//printf("tot_mem: %.2f\n", tot_mem);
+	
+	handle_error_fclose( fclose( my_file3), "process_memory_usage f3, error closing");
 	
 	//float memory_usage = ( param[0] + param[1] + param[3] + param[5] ) / 4032888 ;
-	float memory_usage = ( param[5] * getpagesize()) / 4032888000 ;
+	//float memory_usage = ( param[5] * getpagesize()) / 4032888000 ;
+	float memory_usage = ( param[5] * getpagesize()) / (tot_mem*1000) ;
 	 
 	return 100 * memory_usage;
 }

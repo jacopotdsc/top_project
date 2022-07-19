@@ -102,9 +102,9 @@ void get_process(){
 		free(path3);
 	}
 	
-	free(my_dir);
-	//int ret = closedir( my_dir );
-	//if( ret == 0) printf("errore\n");
+	free(my_strucg);
+	int ret = closedir( my_dir );
+	if( ret != 0) printf("errore\n");
 	
 	printf("---- plot terminated ----\n");
 }

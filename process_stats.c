@@ -42,6 +42,8 @@ void read_file_stat(const char* path, float* param){	// legge il file /proc/[pid
 	//printf("%f %f %f %f %f %f\n",param[0], param[1], param[2], param[3], param[4], param[5]);
 	//sleep(3);
 	
+	free(line);
+	//free(token);
 }
 
 float calculate_cpu_usage(const char* path){	// calcola l'utilizzo della cpu
@@ -102,6 +104,7 @@ void read_file_status(const char* path, float* param){	// legge il file /proc/[p
 			//printf("token: %s, param[%d]: %f\n", token, i, param[i]);
 			i++;
 		}
+		free(token);
 	}
 	
 	handle_error_fclose( fclose( my_file), "read_file_status f1, error closing");
@@ -111,7 +114,6 @@ void read_file_status(const char* path, float* param){	// legge il file /proc/[p
 	
 	handle_error(my_file2, "process_stat.c -> read_file_status, f1: file not opened");	
 	
-	char aux;
 	fscanf(my_file2, "%*s %f", &param[3]);	// aux[1] serve per scaricare da qualche parte la scanf
 	
 	handle_error_fclose( fclose( my_file2), "read_file_status f2, error closing");
@@ -119,40 +121,13 @@ void read_file_status(const char* path, float* param){	// legge il file /proc/[p
 	//printf("%f %f %f %f \n",param[0], param[1], param[2], param[3]);
 	//sleep(3);
 	
+	free(line);
+	
 }
 
 float process_memory_usage(const char* path){	// calcola l'uso della memoria
-	/*
-	float param[4];
-	read_file_status(path, param);
-	
-	/*float RssAnon 	= param[0];
-	float RssFile 	= param[1];
-	float RssShmem 	= param[2];
-	float tot_mem 	= param[3];
-	
-	printf("\nmra: %f, rf: %f, rs: %f, tm: %f\n", RssAnon, RssFile, RssShmem, tot_mem);
-	printf("path: %s\n", path);
-	
-	float memory_usage = ( RssAnon + RssFile + RssShmem ) / tot_mem;*/
-	
+
 	float param[7];
-	
-	/*FILE* my_file = fopen(path, "r"); 	//apro il file in lettura
-	
-	handle_error(my_file, "process_stats.c -> process_memory_usage, f1: file not opened");
-	
-	//fscanf(my_file, "%f %f %f %f %f %f %f", &param[0], &param[1], &param[2], &param[3], &param[4], &param[5], &param[6] );
-	fscanf(my_file, "%f %f %f %f %f %f %f", &param[0]);
-	
-	handle_error_fclose( fclose( my_file), "process_memory_usage f1, error closing");
-	
-	// ram, text, data
-	//float memory_usage = ( param[0] / general_memory_usage() );
-	//printf("0: %f, 1: %f, 3: %f, 5: %f\, mem_usage: %f \n", param[0], param[1], param[3], param[5], general_memory_usage() );
-	
-	
-	*/
 	
 	FILE* my_file2 = fopen(path, "r"); 	//apro il file in lettura
 	
@@ -163,7 +138,7 @@ float process_memory_usage(const char* path){	// calcola l'uso della memoria
 	
 	handle_error_fclose( fclose( my_file2), "process_memory_usage f1, error closing");
 	
-	//+printf("p[0]: %f, p[1]: %f, p[3]: %f, p[5]: %f\n", param[0], param[1], param[3], param[5]);
+	//printf("p[0]: %f, p[1]: %f, p[3]: %f, p[5]: %f\n", param[0], param[1], param[3], param[5]);
 	
 	
 	// calcolo la ram totale
@@ -181,6 +156,8 @@ float process_memory_usage(const char* path){	// calcola l'uso della memoria
 		//printf("token: %s\n",token);
 		if( strcmp(token, &"MemTotal:") == 0 )
 			tot_mem = atoi( strtok(NULL, " ") );
+		
+		//free(token);
 	}
 	
 	//printf("tot_mem: %.2f\n", tot_mem);
@@ -190,6 +167,8 @@ float process_memory_usage(const char* path){	// calcola l'uso della memoria
 	//float memory_usage = ( param[0] + param[1] + param[3] + param[5] ) / 4032888 ;
 	//float memory_usage = ( param[5] * getpagesize()) / 4032888000 ;
 	float memory_usage = ( param[5] * getpagesize()) / (tot_mem*1000) ;
+	 
+	free(line);
 	 
 	return 100 * memory_usage;
 }
@@ -212,16 +191,22 @@ char* process_state(char* path){	// mi restituisce lo stato del processo
 	handle_error(my_file, "process_stats.c -> process_state: file not opened");	
 	
 	char* line;
+	char* my_string;
 	size_t linesize = 0;
 	int i = 0;
 	while( getline(&line, &linesize, my_file) != -1 ){
 
 		char* token = strtok(line, "\t");
 		
-		if( strcmp(token, &"State:") == 0 )
-			return strtok(NULL, " ");
+		if( strcmp(token, &"State:") == 0 ){
+			char* my_string = strtok(NULL, " ");
+			handle_error_fclose( fclose( my_file), "process_state, error closing");
+			free(line);
+			break;
+		}
 	}
 	
-	handle_error_fclose( fclose( my_file), "process_state, error closing");
+	return my_string;
+	
 }
 

@@ -1,37 +1,5 @@
 #include "plotter_process.h"
 
-
-char* create_path_pid(char* pid){	// mi crea la stringa "/proc/[pid]"
-	char string_proc[10] = "/proc/";
-	return strcat(string_proc,pid);
-}
-
-char* create_path(char* actual_path, char* file){
-	printf("create_path: %s\n", actual_path);
-	return strcat(actual_path, file);
-}
-
-char* create_plot_string(char path[]){	// mi restituisce una stringa con le statistiche del processo
-	
-	//char path_stat[100]   = "/stat";
-	//char path_status[100] = "/status";
-	
-	printf("path: %s \n", path );
-	
-	//printf("path: %s -> path_status: %s, len: %d, sizeof: %d\n", path, path_status, strlen(path_status), sizeof(path_status) );
-	
-	//char* new_path_stat = (char*)malloc(sizeof(char)*100); 
-	//new_path_stat = strcat(*path, path_stat);
-	//printf("new_path_stat: %s\n", new_path_stat);
-	
-	/*char* new_path_status= (char*)malloc(sizeof(char)*100); 
-	new_path_status = strcat(path, path_status);
-	printf("new_path_status: %s\n", new_path_status);*/
-	
-	return "-- ok --";
-	
-}
-
 void get_process(){
 	
 	DIR* my_dir = opendir("/proc");
@@ -102,9 +70,9 @@ void get_process(){
 		free(path3);
 	}
 	
-	free(my_strucg);
+	free(my_struct);
 	int ret = closedir( my_dir );
-	if( ret != 0) printf("errore\n");
+	if( ret != 0) printf("errore, ret: %d\n", ret);
 	
 	printf("---- plot terminated ----\n");
 }

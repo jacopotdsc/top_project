@@ -28,7 +28,7 @@ void action_process(char* action){
 	printf("\nInsert a process to %s: ", action);
 	scanf(" %s", &pid_str);
 	int pid = atoi(pid_str);
-	int res;	
+	int res = 0;
 	
 	if( strcmp(action, TERMINATE) == 0){		// comando ok
 		//SIG_NOT_IMPLEMENTED(TERMINATE)
@@ -52,26 +52,8 @@ void action_process(char* action){
 	}
 }
 
-int main2(){
-	
-	while(1){
-		sleep(1);
-		
-		printf("-- chiamo --\n");
-		//get_process();
-
-		printf("\ncpu_usage:\t %f %\n", general_cpu_usage() );	// rivedi i valori che restituisce
-		printf("memory_usage:\t %f %\n", general_memory_usage() );
-		
-		//printf("proc_cpu_usage:\t %f %\n", process_cpu_usage("/proc/2348/stat") );
-		//printf("proc_memory usage:\t %f %\n", process_memory_usage("/proc/2348/status") );	// sistema, utilizza quella virtuale per il calcolo
-		
-		//sleep(3);
-	}
-}
-
-float total_cpu_usage;
-float total_mem_usage;
+float total_cpu_usage = 0;
+float total_mem_usage = 0;
 
 int main(int argc, char* argv[]){
 	
@@ -116,7 +98,7 @@ int main(int argc, char* argv[]){
 		}
 		else if( strcmp(command, HELP) == 0){
 			//NOT_IMPLEMENTED(HELP);
-			printf("\ncommand list:\n - terminate: terminate a process\n - kill: kill a process\n - suspend: force a process to sleep\n - resume: wake up a process\n - plot: plot statistics like cpu usage and memory usage\n - stop: terminate this programm\n");
+			printf("\nCommand list:\n - terminate: terminate a process\n - kill: kill a process\n - suspend: force a process to sleep\n - resume: wake up a process\n - plot: plot statistics like cpu usage and memory usage\n - stop: terminate this programm\n");
 		}
 		else if( strcmp(command, STOP ) == 0){
 			printf("-- terminated\n");

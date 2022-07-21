@@ -27,7 +27,7 @@ void get_process(){
 			
 		//printf("dir: %s\n", name);
 		
-		char string_proc[10] = "/proc/";
+		char string_proc[200] = "/proc/";
 		char* path = strcat(string_proc, name);
 		//printf("0 -> path: %s \n", path);
 		

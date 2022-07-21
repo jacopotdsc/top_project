@@ -199,7 +199,7 @@ char* process_state(char* path){	// mi restituisce lo stato del processo
 		char* token = strtok(line, "\t");
 		
 		if( strcmp(token, &"State:") == 0 ){
-			char* my_string = strtok(NULL, " ");
+			my_string = strtok(NULL, " ");
 			handle_error_fclose( fclose( my_file), "process_state, error closing");
 			free(line);
 			break;
